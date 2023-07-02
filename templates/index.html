@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Content</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+</head>
+<body>
+    <!-- <div id="app">
+        <el-input v-model="keyword" placeholder="Keyword"></el-input>
+        <el-select v-model="source">
+          <el-option label="东乾西象核心群" value="东乾西象核心群"></el-option>
+          <el-option label="东乾西象射覆交流群" value="东乾西象射覆交流群"></el-option>
+        </el-select>
+        <el-button type="primary" @click="search">Search</el-button>
+    </div> -->
+
+    <h1>Database Content:</h1>
+    <table>
+        <tr>            
+            <th>Date</th>
+            <th>Question</th>
+            <th>Fu</th>
+            <th>Answer</th>
+        </tr>
+        {% for item in data %}
+        <tr>            
+            <td>{[ item.time ]}</td>
+            <td>{[ item.question ]}</td>
+            <td><img src="static/images/{[ item.source ]}/{[ item.img_question ]}" alt="Image" style="max-width: 100px; max-height: 100px;"></td>
+            <td><img src="static/images/{[ item.source ]}/{[ item.img_answer ]}" alt="Image" style="max-width: 100px; max-height: 100px;"></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- <script>
+        const app = Vue.createApp({
+          data() {
+            return {
+              keyword: '',
+              source: '',
+            };
+          },
+          methods: {
+            search() {
+              // 执行搜索操作，根据 keyword 和 source 进行查询
+            },
+          },
+        });
+      
+        app.mount('#app');
+      </script> -->
+         
+</body>
+</html>
