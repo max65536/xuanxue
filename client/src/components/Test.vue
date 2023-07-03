@@ -80,8 +80,8 @@
     },
     methods: {
       getFus() {
-        const host = 'http://localhost:5000';
-        const path = 'http://localhost:5000/api/fus';
+        const host = 'http://max65536.com';
+        const path = host + '/api/fus';
         console.log(this.page);
         console.log(this.selectedDate);
         var timefrom = this.selectedDate[0].toISOString()
