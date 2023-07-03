@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     getFus() {
-      const host = 'http://localhost:5000';
+      const host = 'http://max65536.com';
       const path = host+'/api/fus';
       console.log(this.page);
       console.log(this.selectedDate);

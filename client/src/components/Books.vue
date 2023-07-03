@@ -133,7 +133,7 @@
     },
     methods: {
       addBook(payload) {
-        const path = 'http://localhost:5000/books';
+        const path = 'http://max65536.com/books';
         axios.post(path, payload)
           .then(() => {
             this.getBooks();
@@ -146,7 +146,7 @@
           });
       },
       getBooks() {
-        const path = 'http://localhost:5000/books';
+        const path = 'http://max65536.com/books';
         axios.get(path)
           .then((res) => {
             this.books = res.data.books;
