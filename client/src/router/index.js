@@ -10,9 +10,9 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Fus',
+      name: 'fus',
       component: Fus
-    },
+    },  
     {
       path: '/book',
       name: 'book',
