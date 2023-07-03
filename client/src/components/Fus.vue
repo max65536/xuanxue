@@ -81,7 +81,7 @@ export default {
   methods: {
     getFus() {
       const host = 'http://localhost:5000';
-      const path = 'http://localhost:5000/api/fus';
+      const path = host+'/api/fus';
       console.log(this.page);
       console.log(this.selectedDate);
       var timefrom = this.selectedDate[0].toISOString()

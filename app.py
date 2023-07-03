@@ -4,10 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from api import Page, get_page_index
 from datetime import datetime
-
+import os
 from IPython import embed
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='client/dist')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/xuanxue'
 app.jinja_env.variable_start_string = r'{['
 app.jinja_env.variable_end_string = r']}'
@@ -34,16 +34,25 @@ class Fu(db.Model):
 def serve_static(filename):
     return send_from_directory('static/vue_test', filename)
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        print(os.path.exists(app.static_folder + '/' + path))
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
 @app.route('/api/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
-@app.route('/')
-def index():
-    fus = Fu.query.limit(10).all()
-    # print(data)
-    # embed()
-    return render_template('index.html', data=fus)
+# @app.route('/')
+# def index():
+#     fus = Fu.query.limit(10).all()
+#     # print(data)
+#     # embed()
+#     return render_template('index.html', data=fus)
 
 @app.route('/<path:fallback>')
 def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该方法
