@@ -5,6 +5,7 @@ from flask import render_template
 from api import Page, get_page_index
 from datetime import datetime
 import os
+import json
 from IPython import embed
 
 app = Flask(__name__, static_folder='client/dist')
@@ -37,11 +38,12 @@ def serve_static(filename):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    print(path)
     if path.startswith("static/images"):
-        print(path)
+        # print(path)
         return send_from_directory('', path)
     elif path != "" and os.path.exists(app.static_folder + '/' + path):
-        print(os.path.exists(app.static_folder + '/' + path))
+        # print(os.path.exists(app.static_folder + '/' + path))
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
@@ -57,20 +59,13 @@ def ping_pong():
 #     # embed()
 #     return render_template('index.html', data=fus)
 
-@app.route('/<path:fallback>')
-def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该方法
-    if fallback.startswith('css/') or fallback.startswith('js/')\
-            or fallback.startswith('img/') or fallback == 'favicon.ico':
-        return app.send_static_file(fallback)
-    else:
-        return app.send_static_file('index.html')
-
-@app.route('/manage/blogs2')
-def get(*,page='1'):
-    return {
-        '__template__':'manage_blogs2.html',
-        'page_index':get_page_index(page)
-    }
+# @app.route('/<path:fallback>')
+# def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该方法
+#     if fallback.startswith('css/') or fallback.startswith('js/')\
+#             or fallback.startswith('img/') or fallback == 'favicon.ico':
+#         return app.send_static_file(fallback)
+#     else:
+#         return app.send_static_file('index.html')
 
 @app.route('/search', methods=['GET'])
 def search(request):
@@ -116,22 +111,54 @@ def api_fus():
     page = request.args.get('page', 1, type=int)
     timefrom = datetime.strptime(request.args.get('from'), "%Y-%m-%dT%H:%M:%S.%fZ")
     timeto = datetime.strptime(request.args.get('to'), "%Y-%m-%dT%H:%M:%S.%fZ")
-    print("page:", page)
-    print("datetime:", timefrom, timeto)
+    # print("page:", page)
+    # print("datetime:", timefrom, timeto)
     response_object = {'status': 'success'}
     page_index=get_page_index(page)
     total_count = Fu.query.filter(Fu.source.startswith("东乾")).filter(Fu.time.between(timefrom, timeto)).count()
-    print("--------------total------------", total_count)
+    # print("--------------total------------", total_count)
     p=Page(total_count,page_index)
     response_object['total'] = p.page_count
 
-    fus = Fu.query.filter(Fu.source.startswith("东乾")).filter(Fu.time.between(timefrom, timeto)).order_by("time").offset(p.offset).limit(p.limit).all()
+    fus = Fu.query.filter(Fu.source.startswith("东乾"))\
+                        .filter(Fu.time.between(timefrom, timeto))\
+                        .order_by("time").offset(p.offset).limit(p.limit)\
+                        .all()
+    
     fus_list = [item.as_dict() for item in fus]
     response_object['fus'] = fus_list
     if len(fus)>0:
         print(fus[0].as_dict())
     return jsonify(response_object)
 
+@app.route('/api/delete', methods=['POST'])
+def delete_fu():
+    image = request.args.get('image', "")
+    if image != "":
+        Fu.query().filter(Fu.image_qus == image).delete()
+    response_object = {'status': 'success'}
+    return response_object
+
+@app.route('/api/edit_answer', methods=['POST'])
+def edit_answer():
+    data = json.loads(request.data)
+    image = data.get('image_question', "")
+    answer = data.get('answer', "")
+    # embed()
+    # print("image:", image, "answer:", answer)
+    if image != "" and answer != "":
+        row = Fu.query.filter(Fu.img_question == image).first()
+        if row:
+            row.answer = answer
+            db.session.commit()
+            response_object = {'status': 'success'}
+            # print(row.answer)
+        else:
+            response_object = {'status': 'failed', 'message': 'Row not found'}
+    else:
+        response_object = {'status': 'failed', 'message': 'Invalid input'}
+    # print(response_object)
+    return response_object
 
 @app.route('/api/search', methods=['POST'])
 def search_fu():
